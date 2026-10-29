@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate 一键脱敏导出
 // @namespace    local.my-translate.export
-// @version      0.2.0
+// @version      0.2.1
 // @description  导出当前已加载的 HTML 样本，清除已知个人资料、令牌、输入值和脚本；不自动点击或上传。
 // @match        http://*/*
 // @match        https://*/*
@@ -13,7 +13,8 @@
 (() => {
     'use strict';
     const redacted = '[REDACTED]';
-    const privateRegions = '[menuitemname="Client Details"] .panel-body, .div-service-name, [menuitemname="Client Contacts"] .list-group-item:not([menuitemname="No Contacts"]), .ticket-number, .ticket-subject, .recent-ticket .truncate, .service-renewal h3, .service-renewal h4, select[name="productid"] option, #tableServicesList tbody td a:not(.btn)';
+    const privateRegions = '[menuitemname="Client Details"] .panel-body, .div-service-name, [menuitemname="Client Contacts"] .list-group-item:not([menuitemname="No Contacts"]), .ticket-number, .ticket-subject, .recent-ticket .truncate, .service-renewal h3, .service-renewal h4, select[name="productid"] option, select[name="contactid"] option, select[name="billingcid"] option, #tableServicesList tbody td a:not(.btn)';
+    const publicContactOption = element => element.matches('option') && element.closest('select[name="contactid"], select[name="billingcid"]') && ['Add New Contact', 'Use Default Contact (Details Above)'].includes(element.textContent.trim());
     const publicEmails = new Set(['sales@greencloudvps.com', 'noreply@netcup.com']);
 
     function collectSecrets(doc) {
@@ -32,6 +33,7 @@
             if (match) add(match[1]);
         }
         for (const el of doc.querySelectorAll(privateRegions)) {
+            if (publicContactOption(el)) continue;
             const walker = doc.createTreeWalker(el, 4);
             while (walker.nextNode()) add(walker.currentNode.data);
             for (const match of el.textContent.matchAll(/#\d{4,}/g)) add(match[0]);
@@ -76,6 +78,7 @@
         // 删除脚本、嵌入内容、样式资源和浏览器扩展注入物，避免令牌和追踪参数残留。
         for (const el of root.querySelectorAll('script, style, link, base, iframe, object, embed, template, noscript, svg, canvas, meta:not([charset]), doubao-ai-csui, [id^="doubao-"], [id^="kiss-"], #pv-float-bar-container')) el.remove();
         for (const el of root.querySelectorAll(privateRegions)) {
+            if (publicContactOption(el)) continue;
             const walker = doc.createTreeWalker(el, 4);
             while (walker.nextNode()) if (walker.currentNode.data.trim()) walker.currentNode.data = redacted;
         }

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate
 // @namespace    local.my-translate
-// @version      0.7.0
+// @version      0.8.0
 // @description  指定网站界面的本地简体中文汉化，按站点选择规则，保留用户数据及产品名称。
 // @homepageURL  https://github.com/wayner6/my_translate
 // @supportURL   https://github.com/wayner6/my_translate/issues
@@ -600,6 +600,116 @@ const translationState = (() => {
         'Setup Fee': '设置费',
         'Add to Cart': '加入购物车',
         'A description (tagline) is not available for this product.': '此产品暂无简介。',
+        'First Name': '名',
+        'Last Name': '姓',
+        'Company Name': '公司名称',
+        'Phone Number': '电话号码',
+        'Address 1': '地址 1',
+        'Address 2': '地址 2',
+        'City': '城市',
+        'State/Region': '州 / 省 / 地区',
+        'Zip Code': '邮政编码',
+        'Country': '国家 / 地区',
+        'Payment Method': '付款方式',
+        'Use Default (Set Per Order)': '使用默认方式（按订单设置）',
+        'Crypto (BTC/ETH/BNB/USDT/etc)': '加密货币（BTC/ETH/BNB/USDT 等）',
+        'Alipay': '支付宝',
+        'Unionpay': '银联',
+        'Bank Transfer (USA - Stripe ACH)': '银行转账（美国 - Stripe ACH）',
+        'Bank Transfer (Manual EU/UK/USA)': '银行转账（人工处理，欧盟 / 英国 / 美国）',
+        'Default Billing Contact': '默认账单联系人',
+        'Use Default Contact (Details Above)': '使用默认联系人（上述资料）',
+        'Language': '语言',
+        'Default': '默认',
+        'Arabic': '阿拉伯语',
+        'Azerbaijani': '阿塞拜疆语',
+        'Catalan': '加泰罗尼亚语',
+        'Chinese': '中文',
+        'Croatian': '克罗地亚语',
+        'Czech': '捷克语',
+        'Danish': '丹麦语',
+        'Dutch': '荷兰语',
+        'Estonian': '爱沙尼亚语',
+        'Farsi': '波斯语',
+        'French': '法语',
+        'German': '德语',
+        'Hebrew': '希伯来语',
+        'Hungarian': '匈牙利语',
+        'Italian': '意大利语',
+        'Macedonian': '马其顿语',
+        'Norwegian': '挪威语',
+        'Portuguese-br': '葡萄牙语（巴西）',
+        'Portuguese-pt': '葡萄牙语（葡萄牙）',
+        'Romanian': '罗马尼亚语',
+        'Russian': '俄语',
+        'Spanish': '西班牙语',
+        'Swedish': '瑞典语',
+        'Turkish': '土耳其语',
+        'Ukranian': '乌克兰语',
+        'How did you find us?': '您是如何了解到我们的？',
+        'None': '无',
+        'Other Search Engine': '其他搜索引擎',
+        'Friend': '朋友推荐',
+        'Other': '其他',
+        'Email Preferences': '邮件偏好设置',
+        'General Emails - All account related emails': '常规邮件 — 所有账户相关邮件',
+        'Invoice Emails - New Invoices, Reminders, & Overdue Notices': '账单邮件 — 新账单、付款提醒及逾期通知',
+        'Support Emails - Receive a CC of all Support Ticket Communications': '支持邮件 — 接收所有工单往来邮件的抄送',
+        'Product Emails - Welcome Emails, Suspensions & Other Lifecycle Notifications': '产品邮件 — 欢迎邮件、暂停服务及其他服务状态通知',
+        'Domain Emails - Registration/Transfer Confirmation & Renewal Notices': '域名邮件 — 注册 / 转移确认及续费通知',
+        'Affiliate Emails - Receive Affiliate Notifications': '推广邮件 — 接收推广联盟通知',
+        'Choose Contact': '选择联系人',
+        'Add New Contact': '添加新联系人',
+        'Go': '前往',
+        'General Emails - General Announcements & Password Reminders': '常规邮件 — 常规公告及密码提醒',
+        'Invoice Emails - Invoices & Billing Reminders': '账单邮件 — 账单及付款提醒',
+        'Support Emails - Receive a copy of all support ticket communications created by the parent account holder': '支持邮件 — 接收主账户持有人创建的所有工单往来邮件副本',
+        'Product Emails - Order Details, Welcome Emails, etc...': '产品邮件 — 订单详情、欢迎邮件等',
+        'Domain Emails - Renewal Notices, Registration Confirmations, etc...': '域名邮件 — 续费通知、注册确认等',
+        'Save Changes': '保存更改',
+        'Cancel': '取消',
+        'Email Address / Last Login': '电子邮箱 / 上次登录',
+        'Owner': '账户所有者',
+        'Manage Permissions': '管理权限',
+        'Remove Access': '移除访问权限',
+        '* Account owners always have full permissions over a client account.': '* 账户所有者始终拥有客户账户的全部权限。',
+        'Invite New User': '邀请新用户',
+        'Inviting a new user allows you to invite a new user to your account. If the invitee already has an existing user account, they will be able to access your account using their existing login credentials. If the user does not yet have a user account, they will be able to create one.':
+            '您可以邀请新用户访问您的账户。如果受邀人已有用户账户，可使用现有登录凭据访问您的账户；如果尚无用户账户，则可以创建一个。',
+        'All Permissions': '全部权限',
+        'Choose Permissions': '选择权限',
+        'Modify Master Account Profile - Access and modify the client profile information': '修改主账户资料 — 访问并修改客户资料',
+        'View & Manage Contacts - Access and manage contacts': '查看和管理联系人 — 访问并管理联系人',
+        'View Products & Services - View access to products, services and addons': '查看产品与服务 — 查看产品、服务及附加组件',
+        'View & Modify Product Passwords - Allow password resets and other actions': '查看和修改产品密码 — 允许重置密码及其他操作',
+        'Perform Single Sign-On - Allow single sign-on into services': '使用单点登录 — 允许通过单点登录进入服务',
+        'View Domains - View access to domain registrations': '查看域名 — 查看域名注册信息',
+        'Manage Domain Settings - Allow domain management eg. nameservers/whois/transfers': '管理域名设置 — 管理域名服务器、WHOIS 信息、转移等',
+        'View & Pay Invoices - View and payment access to invoices': '查看和支付账单 — 查看账单并付款',
+        'View & Accept Quotes - View and acceptance permissions for quotes': '查看和接受报价 — 查看并接受报价单',
+        'View & Open Support Tickets - Access to open, respond and manage support tickets': '查看和提交工单 — 提交、回复及管理支持工单',
+        'View & Manage Affiliate Account - Access to view and request withdrawals': '查看和管理推广账户 — 查看推广账户并申请提现',
+        'View Emails - Access to view account email history': '查看邮件 — 查看账户邮件记录',
+        'Place New Orders/Upgrades/Cancellations - Allow placing of new orders': '提交订单 / 升级 / 取消 — 允许提交新订单',
+        'Send Invite': '发送邀请',
+        'Are you sure you wish to remove this users access?': '确定要移除此用户的访问权限吗？',
+        'They will no longer be able to access or administer this account.': '移除后，该用户将无法再访问或管理此账户。',
+        'Confirm': '确认',
+        'Cancel Invite': '取消邀请',
+        'Are you sure you wish to cancel this invite?': '确定要取消此邀请吗？',
+        'The user will not be notified of this cancellation.': '取消邀请不会通知该用户。',
+        'Single Sign-On': '单点登录',
+        'Third party applications leverage the Single Sign-On functionality to provide direct access to your billing account without you having to re-authenticate.': '第三方应用可以通过单点登录功能直接访问您的账务账户，无需再次认证。',
+        'ON': '开启',
+        'OFF': '关闭',
+        'Single Sign-On is currently permitted for your account.': '您的账户目前允许单点登录。',
+        'Single Sign-On is currently disabled for your account.': '您的账户目前已禁用单点登录。',
+        'You may wish to disable this functionality if you provide access to any of your third party applications to users who you do not wish to be able to access your billing account.': '如果您允许某些用户访问第三方应用，但不希望他们访问您的账务账户，建议禁用此功能。',
+        'My Emails': '我的邮件',
+        'Your email history with us': '您在本站的邮件记录',
+        'Date Sent': '发送日期',
+        'Message Subject': '邮件主题',
+        'View Message': '查看邮件',
     }));
     const commonScope = '#header, #main-menu, #sub-menu, .content-overlay > h1, #footer';
     // WHMCS 的 clientarea.php 使用 action 区分子页面；未提供的子页只处理公共导航。
@@ -608,21 +718,22 @@ const translationState = (() => {
     const action = params.get('action');
     const home = path === '/billing/clientarea.php' && !action;
     const login = /^\/billing\/(?:login|dologin\.php)$/.test(path);
-    const lists = path === '/billing/clientarea.php' && ['services', 'invoices', 'quotes'].includes(action);
+    const lists = path === '/billing/clientarea.php' && ['services', 'invoices', 'quotes', 'details', 'security', 'emails'].includes(action);
     const addons = path === '/billing/cart.php' && (params.get('gid') === 'addons' || Boolean(document.querySelector('#Secondary_Sidebar-Categories-Addons.active')));
     const ticketDepartments = path === '/billing/submitticket.php' && !params.has('step') && !params.has('deptid');
     const supported = home || login || lists || addons || ticketDepartments || [
-        '/billing/account/paymentmethods', '/billing/affiliates.php', '/billing/announcements',
+        '/billing/account/paymentmethods', '/billing/account/contacts', '/billing/account/users', '/billing/affiliates.php', '/billing/announcements',
         '/billing/download', '/billing/knowledgebase', '/billing/serverstatus.php',
         '/billing/service-renewals', '/billing/store/13th-birthday-sale', '/billing/supporttickets.php',
     ].includes(path);
     const homeScope = '.header-lined, .panel-heading, .panel-footer, .tiles .title, .home-kb-search, #servicesPanel .div-service-status, #servicesPanel .div-service-buttons, #servicesPanel .btn-view-more, #ticketsPanel .label, #ticketsPanel small, #Secondary_Sidebar-Client_Contacts-No_Contacts';
     const scope = `${commonScope}${home ? `, ${homeScope}` : ''}${login ? ', .logincontainer' : ''}${supported ? ', #main-body, #modalAjax, #modalGeneratePassword, #fullpage-overlay, #recommendationsModal' : ''}`;
-    const skipped = 'script, style, noscript, textarea, option:not([value]), select[name="productid"], pre, code, #languageChooserContent, .div-service-name, [menuitemname="Client Details"] .panel-body, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, .product-desc, .feature-value, .summary-totals .float-right, .price, .amt, .stat, .badge, [contenteditable]:not([contenteditable="false"]), .notranslate, [translate="no"]';
+    const skipped = 'script, style, noscript, textarea, option:not([value]), select[name="productid"], select[name="country"], select[name="state"], .country-list, .selected-dial-code, .selected-flag, pre, code, #languageChooserContent, .div-service-name, [menuitemname="Client Details"] .panel-body, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, .product-desc, .feature-value, .summary-totals .float-right, .price, .amt, .stat, .badge, [contenteditable]:not([contenteditable="false"]), .notranslate, [translate="no"]';
     const normalize = text => text.replace(/\s+/g, ' ').trim();
     function eligible(el) {
         if (el.closest(skipped) || !el.closest(scope)) return false;
         if (el.closest('.product header') && !el.closest('.qty')) return false;
+        if (el.closest('select[name="contactid"], select[name="billingcid"]') && !['Add New Contact', 'Use Default Contact (Details Above)'].includes(normalize(el.textContent))) return false;
         // 正文数据和主题不做词库匹配；只处理已识别的状态、操作按钮及空表提示。
         if (el.closest('tbody td') && !el.closest('.btn, button, .label, .status, .textgreen, .textgrey, .dataTables_empty')) return false;
         if (el.closest('#ticketsPanel .list-group-item') && !el.closest('.label, small')) return false;
@@ -634,6 +745,10 @@ const translationState = (() => {
         if (!parent || !eligible(parent)) return;
         const original = normalize(node.data);
         let translated = terms.get(original);
+        if (!translated && path === '/billing/account/users' && parent.matches('p')) {
+            const match = /^([\d,]+) Users? Found$/.exec(original);
+            if (match) translated = `找到 ${match[1]} 位用户`;
+        }
         if (!translated && parent.matches('.dataTables_info')) {
             const match = /^Showing ([\d,]+) to ([\d,]+) of ([\d,]+) entries(?: \(filtered from ([\d,]+) total entries\))?$/.exec(original);
             if (match) translated = `显示第 ${match[1]} 至 ${match[2]} 条，共 ${match[3]} 条${match[4] ? `（从 ${match[4]} 条记录中筛选）` : ''}`;
@@ -676,7 +791,7 @@ const translationState = (() => {
         if (root.nodeType !== Node.ELEMENT_NODE || root.closest(skipped)) return;
         const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
         while (walker.nextNode()) translateText(walker.currentNode);
-        for (const el of [root, ...root.querySelectorAll('[title], [placeholder], [aria-label], input[type="submit"]:not([name]), input[type="button"]:not([name])')]) {
+        for (const el of [root, ...root.querySelectorAll('[title], [placeholder], [aria-label], input[type="submit"], input[type="button"]:not([name]), input[type="reset"]:not([name])')]) {
             if (!eligible(el)) continue;
             for (const attr of ['title', 'placeholder', 'aria-label']) {
                 const original = normalize(el.getAttribute(attr) || '');
@@ -687,9 +802,16 @@ const translationState = (() => {
                 }
                 if (translated) translationState.attribute(el, attr, translated);
             }
-            if (el.matches('input[type="submit"]:not([name]), input[type="button"]:not([name])')) {
+            if (el.matches('input[type="submit"]:not([name]), input[type="button"]:not([name]), input[type="reset"]:not([name])')) {
                 const translated = terms.get(normalize(el.value));
                 if (translated) translationState.attribute(el, 'value', translated);
+            } else if (el.matches('input[type="submit"][name]')) {
+                // 具名提交按钮的 value 会参与提交，只增加中文提示，不改变业务值。
+                const translated = terms.get(normalize(el.value));
+                if (translated) {
+                    if (!el.hasAttribute('title')) translationState.attribute(el, 'title', translated);
+                    if (!el.hasAttribute('aria-label')) translationState.attribute(el, 'aria-label', translated);
+                }
             }
         }
     }
