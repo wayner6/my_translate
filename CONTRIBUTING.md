@@ -10,7 +10,7 @@ src/
 ├── sites/
 │   ├── netcup.js           netcup 独立词库、定位及动态内容处理
 │   └── greencloud.js       GreenCloud 独立词库、定位及动态内容处理
-└── exporter.js             导出脚本源码，包含其元数据
+└── exporter.js             导出器源码、独立版本及权限元数据
 scripts/
 ├── build.cjs               生成并检查安装文件
 └── sanitize-uploads.cjs    本地样本脱敏
@@ -24,7 +24,7 @@ uploads/                    本地 HTML 样本，被 Git 忽略
 
 ## 开始开发
 
-需要 Node.js 22 或更新版本。
+先 Fork 仓库，在自己的 Fork 中添加日常需要的站点，无需追求覆盖所有网站。需要 Node.js 22 或更新版本。
 
 ```sh
 npm ci
@@ -79,4 +79,6 @@ DOM 测试不等于完整浏览器交互测试，实际站点还需确认排版�
 
 ## Fork 后分发
 
-如果使用自己的仓库发布，修改 `scripts/build.cjs` 中翻译脚本的主页、反馈及安装/更新地址，以及 `src/exporter.js` 中导出脚本的对应地址，再构建。避免安装后的更新仍指向上游、覆盖自己的改动。
+将 `package.json` 的 `repository.url` 改为自己的 GitHub HTTPS 仓库地址，例如 `https://github.com/你的用户名/my_translate.git`。`npm run build` 会统一生成翻译脚本与导出器的主页和安装/更新地址，默认使用 `main` 分支；无需在站点源码或导出器中重复配置这些 URL。
+
+同时将 README 中的安装链接指向自己的 Fork，再提交构建产物。这样更新仍来自自己的仓库，不会被上游覆盖。

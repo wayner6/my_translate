@@ -13,7 +13,8 @@ test('导出器权限支持所有 HTTP/HTTPS，不新增网络或自动执行权
         'http://*/*', 'https://*/*',
     ]);
     assert.deepEqual([...source.matchAll(/^\/\/ @grant\s+(.+)$/gm)].map(match => match[1]), ['GM_registerMenuCommand']);
-    assert.match(source, /^\/\/ @version\s+0\.1\.3$/m);
+    const exporterSource = fs.readFileSync(path.join(project, 'src/exporter.js'), 'utf8');
+    assert.equal(/^\/\/ @version\s+(.+)$/m.exec(source)[1], /^\/\/ @version\s+(.+)$/m.exec(exporterSource)[1]);
     assert.doesNotMatch(source, /^\/\/ @connect\s/m);
 });
 

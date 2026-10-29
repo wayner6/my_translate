@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate
 // @namespace    local.my-translate
-// @version      0.6.0
+// @version      0.6.1
 // @description  指定网站界面的本地简体中文汉化，按站点选择规则，保留用户数据及产品名称。
 // @homepageURL  https://github.com/wayner6/my_translate
 // @supportURL   https://github.com/wayner6/my_translate/issues

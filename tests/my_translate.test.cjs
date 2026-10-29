@@ -22,8 +22,11 @@ test('单一翻译脚本入口、通用身份、站点权限和更新地址', ()
     assert.equal((source.match(/\/\/ ==UserScript==/g) || []).length, 1);
     assert.match(source, /^\/\/ @name\s+my_translate$/m);
     assert.equal(/^\/\/ @version\s+(.+)$/m.exec(source)[1], require('../package.json').version);
-    assert.match(source, /^\/\/ @downloadURL\s+https:\/\/raw\.githubusercontent\.com\/wayner6\/my_translate\/main\/my_translate\.user\.js$/m);
-    assert.match(source, /^\/\/ @updateURL\s+https:\/\/raw\.githubusercontent\.com\/wayner6\/my_translate\/main\/my_translate\.user\.js$/m);
+    const repository = require('../package.json').repository.url.replace(/\.git$/, '');
+    const download = repository.replace('https://github.com/', 'https://raw.githubusercontent.com/') + '/main/my_translate.user.js';
+    assert.equal(/^\/\/ @homepageURL\s+(.+)$/m.exec(source)[1], repository);
+    assert.equal(/^\/\/ @downloadURL\s+(.+)$/m.exec(source)[1], download);
+    assert.equal(/^\/\/ @updateURL\s+(.+)$/m.exec(source)[1], download);
     assert.deepEqual(source.match(/^\/\/ @match\s+(.+)$/gm).map(line => line.split(/\s+/).at(-1)), [
         ...new Set(require('../src/sites.json').flatMap(site => site.matches)),
     ]);

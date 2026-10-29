@@ -68,6 +68,39 @@ test('构建拒绝重复/越界 id、无效匹配和站点内重复元数据', (
     });
 });
 
+test('只修改仓库配置，即可生成两份脚本的 Fork 主页及更新地址', () => {
+    temporaryProject(folder => {
+        const file = path.join(folder, 'package.json');
+        const config = JSON.parse(fs.readFileSync(file, 'utf8'));
+        for (const suffix of ['', '.git']) {
+            config.repository.url = 'https://github.com/example-user/personal-translations' + suffix;
+            fs.writeFileSync(file, JSON.stringify(config));
+            for (const [name, content] of Object.entries(renderScripts(folder))) {
+                const metadata = [...content.matchAll(/^\/\/ @(homepageURL|downloadURL|updateURL)\s+(.+)$/gm)];
+                assert.equal(metadata.length, 3);
+                const values = Object.fromEntries(metadata.map(match => [match[1], match[2]]));
+                assert.equal(values.homepageURL, 'https://github.com/example-user/personal-translations');
+                assert.equal(values.downloadURL, `https://raw.githubusercontent.com/example-user/personal-translations/main/${name}`);
+                assert.equal(values.updateURL, values.downloadURL);
+                assert.ok(!content.includes('github.com/wayner6/my_translate'));
+                assert.ok(!content.includes('githubusercontent.com/wayner6/my_translate'));
+            }
+        }
+    });
+});
+
+test('构建拒绝缺失或无法生成 GitHub 更新地址的仓库配置', () => {
+    temporaryProject(folder => {
+        const file = path.join(folder, 'package.json');
+        const config = JSON.parse(fs.readFileSync(file, 'utf8'));
+        for (const repository of [undefined, { url: 'https://example.invalid/repo.git' }, { url: 'file:///repo' }, { url: 'https://github.com/user/repo\n// @grant extra' }]) {
+            config.repository = repository;
+            fs.writeFileSync(file, JSON.stringify(config));
+            assert.throws(() => renderScripts(folder), /repository\.url/);
+        }
+    });
+});
+
 test('build --check 检测过期产物但不覆盖，build 可重新生成', () => {
     temporaryProject(folder => {
         fs.mkdirSync(path.join(folder, 'scripts'));

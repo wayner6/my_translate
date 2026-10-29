@@ -5,7 +5,11 @@ const project = path.join(__dirname, '..');
 const banner = '// 由 scripts/build.cjs 自动生成，请修改 src/ 中的源码。';
 
 function renderScripts(root = project) {
-    const { version } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+    const { version, repository } = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8'));
+    const homepage = (repository?.url || '').replace(/\/$/, '').replace(/\.git$/, '');
+    const github = /^https:\/\/github\.com\/([a-z0-9_.-]+\/[a-z0-9_.-]+)$/i.exec(homepage);
+    if (!github) throw new Error('package.json 的 repository.url 必须是 GitHub HTTPS 仓库地址。');
+    const raw = `https://raw.githubusercontent.com/${github[1]}/main`;
     const sites = JSON.parse(fs.readFileSync(path.join(root, 'src/sites.json'), 'utf8'));
     if (!Array.isArray(sites) || !sites.length) throw new Error('src/sites.json 必须包含至少一个站点。');
     const ids = new Set();
@@ -30,10 +34,10 @@ function renderScripts(root = project) {
 // @namespace    local.my-translate
 // @version      ${version}
 // @description  指定网站界面的本地简体中文汉化，按站点选择规则，保留用户数据及产品名称。
-// @homepageURL  https://github.com/wayner6/my_translate
-// @supportURL   https://github.com/wayner6/my_translate/issues
-// @downloadURL  https://raw.githubusercontent.com/wayner6/my_translate/main/my_translate.user.js
-// @updateURL    https://raw.githubusercontent.com/wayner6/my_translate/main/my_translate.user.js
+// @homepageURL  ${homepage}
+// @supportURL   ${homepage}/issues
+// @downloadURL  ${raw}/my_translate.user.js
+// @updateURL    ${raw}/my_translate.user.js
 ${matches.map(value => `// @match        ${value}`).join('\n')}
 // @run-at       document-end
 // @grant        none
@@ -47,7 +51,7 @@ ${bodies.join('\n\n')}
     const exporterSource = fs.readFileSync(path.join(root, 'src/exporter.js'), 'utf8');
     const metadataEnd = '// ==/UserScript==';
     if (!exporterSource.includes(metadataEnd)) throw new Error('src/exporter.js 缺少用户脚本元数据。');
-    const exporter = exporterSource.replace(metadataEnd, `${metadataEnd}\n\n${banner}`);
+    const exporter = exporterSource.replace(metadataEnd, `// @homepageURL  ${homepage}\n// @downloadURL  ${raw}/snapshot-export.user.js\n// @updateURL    ${raw}/snapshot-export.user.js\n${metadataEnd}\n\n${banner}`);
     return { 'my_translate.user.js': translation, 'snapshot-export.user.js': exporter };
 }
 

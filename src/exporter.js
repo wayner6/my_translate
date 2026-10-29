@@ -1,11 +1,8 @@
 // ==UserScript==
 // @name         my_translate 一键脱敏导出
 // @namespace    local.my-translate.export
-// @version      0.1.3
+// @version      0.1.4
 // @description  导出当前已加载的 HTML 样本，清除已知个人资料、令牌、输入值和脚本；不自动点击或上传。
-// @homepageURL  https://github.com/wayner6/my_translate
-// @downloadURL  https://raw.githubusercontent.com/wayner6/my_translate/main/snapshot-export.user.js
-// @updateURL    https://raw.githubusercontent.com/wayner6/my_translate/main/snapshot-export.user.js
 // @match        http://*/*
 // @match        https://*/*
 // @grant        GM_registerMenuCommand

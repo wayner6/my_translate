@@ -1,7 +1,11 @@
 {
   "name": "my_translate",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wayner6/my_translate.git"
+  },
   "scripts": {
     "build": "node scripts/build.cjs",
     "build:check": "node scripts/build.cjs --check",
