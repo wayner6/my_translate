@@ -63,7 +63,7 @@ test('绿云登录：不读取或改变密码、验证码、令牌，不触发�
 });
 
 test('绿云：带 action 的未知子页面不套用首页规则，语言选项不翻译', () => {
-    const dom = create('<section id="main-menu">Services</section><div class="panel-heading">Services</div><div id="languageChooserContent">English</div>', 'clientarea.php?action=services');
+    const dom = create('<section id="main-menu">Services</section><div class="panel-heading">Services</div><div id="languageChooserContent">English</div>', 'clientarea.php?action=productdetails');
     dom.window.eval(source);
     assert.equal(dom.window.document.querySelector('#main-menu').textContent, '服务');
     assert.equal(dom.window.document.querySelector('.panel-heading').textContent, 'Services');

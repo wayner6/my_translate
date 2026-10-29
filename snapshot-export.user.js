@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate 一键脱敏导出
 // @namespace    local.my-translate.export
-// @version      0.1.0
+// @version      0.1.1
 // @description  导出当前已加载的 HTML 样本，清除已知个人资料、令牌、输入值和脚本；不自动点击或上传。
 // @homepageURL  https://github.com/wayner6/my_translate
 // @downloadURL  https://raw.githubusercontent.com/wayner6/my_translate/main/snapshot-export.user.js
@@ -16,7 +16,7 @@
 (() => {
     'use strict';
     const redacted = '[REDACTED]';
-    const privateRegions = '[menuitemname="Client Details"] .panel-body, .div-service-name, [menuitemname="Client Contacts"] .list-group-item:not([menuitemname="No Contacts"])';
+    const privateRegions = '[menuitemname="Client Details"] .panel-body, .div-service-name, [menuitemname="Client Contacts"] .list-group-item:not([menuitemname="No Contacts"]), .ticket-number, .ticket-subject, .recent-ticket .truncate, .service-renewal h3, .service-renewal h4, select[name="productid"] option, #tableServicesList tbody td a:not(.btn)';
     const publicEmails = new Set(['sales@greencloudvps.com', 'noreply@netcup.com']);
 
     function collectSecrets(doc) {
@@ -37,6 +37,7 @@
         for (const el of doc.querySelectorAll(privateRegions)) {
             const walker = doc.createTreeWalker(el, 4);
             while (walker.nextNode()) add(walker.currentNode.data);
+            for (const match of el.textContent.matchAll(/#\d{4,}/g)) add(match[0]);
         }
         for (const el of doc.querySelectorAll('#ticketsPanel .list-group-item')) {
             for (const node of el.childNodes) if (node.nodeType === 3) add(node.data);
@@ -86,7 +87,7 @@
             const walker = doc.createTreeWalker(cell, 4);
             while (walker.nextNode()) {
                 const node = walker.currentNode;
-                if (node.data.trim() && !node.parentElement.closest('a, button, .label, .text-success, .text-danger, .text-warning')) node.data = redacted;
+                if (node.data.trim() && !node.parentElement.closest('.btn, button, .label, .status, .text-success, .text-danger, .text-warning, .textgreen, .textgrey, .dataTables_empty')) node.data = redacted;
             }
         }
         for (const input of root.querySelectorAll('input')) {
@@ -142,7 +143,11 @@
         const link = document.createElement('a');
         link.href = url;
         const route = location.pathname.replace(/[^a-z0-9_-]+/gi, '_').slice(0, 80);
-        link.download = `${location.hostname}${route}-${Date.now()}.html`;
+        const params = new URLSearchParams(location.search);
+        const action = params.get('action');
+        const suffix = ['services', 'invoices', 'quotes', 'details', 'productdetails'].includes(action) ? `_${action}` : '';
+        const moduleFilter = params.has('module') ? '_filtered' : '';
+        link.download = `${location.hostname}${route}${suffix}${moduleFilter}-${Date.now()}.html`;
         link.click();
         setTimeout(() => URL.revokeObjectURL(url), 10000);
     }

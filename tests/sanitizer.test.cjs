@@ -81,6 +81,37 @@ test('导出菜单和快捷键下载脱敏副本，不自动下载、点击业�
     dom.window.close();
 });
 
+test('新页面脱敏：工单嵌套主题、编号属性、续费主机及服务选项；保留空表提示', () => {
+    const dom = new JSDOM(`<div class="recent-ticket"><div class="truncate" title="#987654 - private subject">#987654 - private subject</div></div>
+        <a id="Ticket_#987654" menuitemname="Ticket #987654">View</a>
+        <table id="tableServicesList"><tbody><tr><td><a>private-host</a></td><td class="dataTables_empty">No records found</td>
+        <td><span class="label">Active</span></td><td><a class="btn">Manage Product</a></td></tr></tbody></table>
+        <div class="ticket-subject">private subject</div><span class="ticket-number">#987654</span>
+        <div class="service-renewal"><h3>Private Plan</h3><h4>private-host</h4></div>
+        <select name="productid"><option value="secret-id">Private Plan - private-host</option></select>`);
+    const html = sanitizeSnapshot(dom.window.document, page);
+    for (const secret of ['987654', 'private-host', 'Private Plan', 'private subject', 'secret-id']) assert.ok(!html.includes(secret), '敏感值残留');
+    const clean = new JSDOM(html);
+    assert.equal(clean.window.document.querySelector('.dataTables_empty').textContent, 'No records found');
+    assert.equal(clean.window.document.querySelector('.btn').textContent, 'Manage Product');
+    assert.equal(clean.window.document.querySelector('.label').textContent, 'Active');
+    dom.window.close(); clean.window.close();
+});
+
+test('导出文件名区分 action 和模块筛选，不泄露模块参数值', () => {
+    const script = fs.readFileSync(path.join(__dirname, '../snapshot-export.user.js'), 'utf8');
+    const dom = new JSDOM('<main></main>', { url: page + '?action=services&module=private-module', runScripts: 'outside-only' });
+    let action, filename;
+    dom.window.GM_registerMenuCommand = (label, callback) => { action = callback; };
+    dom.window.URL.createObjectURL = () => 'blob:sample';
+    dom.window.URL.revokeObjectURL = () => {};
+    dom.window.HTMLAnchorElement.prototype.click = function () { filename = this.download; };
+    dom.window.eval(script); action();
+    assert.match(filename, /_clientarea_php_services_filtered-\d+\.html$/);
+    assert.ok(!filename.includes('private-module'));
+    dom.window.close();
+});
+
 for (const dir of ['Netcup', 'GreenCloud']) {
     const folder = path.join(__dirname, '../uploads', dir);
     for (const file of fs.existsSync(folder) ? fs.readdirSync(folder).filter(name => name.endsWith('.html')) : []) {

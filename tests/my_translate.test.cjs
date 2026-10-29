@@ -21,7 +21,7 @@ function create(url) {
 test('单一翻译脚本入口、通用身份、站点权限和更新地址', () => {
     assert.equal((source.match(/\/\/ ==UserScript==/g) || []).length, 1);
     assert.match(source, /^\/\/ @name\s+my_translate$/m);
-    assert.match(source, /^\/\/ @version\s+0\.4\.0$/m);
+    assert.equal(/^\/\/ @version\s+(.+)$/m.exec(source)[1], require('../package.json').version);
     assert.match(source, /^\/\/ @downloadURL\s+https:\/\/raw\.githubusercontent\.com\/wayner6\/my_translate\/main\/my_translate\.user\.js$/m);
     assert.match(source, /^\/\/ @updateURL\s+https:\/\/raw\.githubusercontent\.com\/wayner6\/my_translate\/main\/my_translate\.user\.js$/m);
     assert.deepEqual(source.match(/^\/\/ @match\s+(.+)$/gm).map(line => line.split(/\s+/).at(-1)), [

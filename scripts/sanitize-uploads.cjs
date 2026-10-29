@@ -15,11 +15,17 @@ const pages = {
     'GreenCloud/clientarea.html': 'https://greencloudvps.com/billing/clientarea.php',
 };
 const samples = [];
-for (const [name, url] of Object.entries(pages)) {
-    const file = path.join(__dirname, '../uploads', name);
-    if (!fs.existsSync(file)) continue;
-    const dom = new JSDOM(fs.readFileSync(file, 'utf8'), { url });
-    samples.push({ file, url, dom });
+const uploads = path.join(__dirname, '../uploads');
+for (const name of fs.readdirSync(uploads, { recursive: true }).filter(name => name.endsWith('.html'))) {
+    const file = path.join(uploads, name);
+    const dom = new JSDOM(fs.readFileSync(file, 'utf8'));
+    const address = dom.window.document.querySelector('meta[name="snapshot-url"]')?.content || pages[name];
+    if (!address) throw new Error(`样本缺少网址，未覆盖文件：${name}`);
+    const url = new URL(address);
+    if (!(url.origin === 'https://www.customercontrolpanel.de' || (url.origin === 'https://greencloudvps.com' && url.pathname.startsWith('/billing/')))) {
+        throw new Error(`不支持的样本站点，未覆盖文件：${name}`);
+    }
+    samples.push({ file, url: url.href, dom });
 }
 // 跨页共享已识别的隐私值，避免同一姓名/邮箱在其他页面中残留。
 const secrets = [...new Set(samples.flatMap(sample => collectSecrets(sample.dom.window.document)))];
