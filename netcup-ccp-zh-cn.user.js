@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         netcup CCP 简体中文
 // @namespace    local.my-translate.netcup
-// @version      0.1.0
-// @homepageURL  https://github.com/wayner6/netcup-ccp-zh-cn
-// @supportURL   https://github.com/wayner6/netcup-ccp-zh-cn/issues
-// @downloadURL  https://raw.githubusercontent.com/wayner6/netcup-ccp-zh-cn/main/netcup-ccp-zh-cn.user.js
-// @updateURL    https://raw.githubusercontent.com/wayner6/netcup-ccp-zh-cn/main/netcup-ccp-zh-cn.user.js
+// @version      0.1.1
+// @homepageURL  https://github.com/wayner6/my_translate
+// @supportURL   https://github.com/wayner6/my_translate/issues
+// @downloadURL  https://raw.githubusercontent.com/wayner6/my_translate/main/netcup-ccp-zh-cn.user.js
+// @updateURL    https://raw.githubusercontent.com/wayner6/my_translate/main/netcup-ccp-zh-cn.user.js
 // @description  本地词库汉化 netcup CCP 公共导航和概览页，不上传页面内容。
 // @match        https://www.customercontrolpanel.de/*
 // @run-at       document-end

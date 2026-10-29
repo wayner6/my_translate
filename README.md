@@ -1,11 +1,13 @@
-# netcup CCP 简体中文汉化
+# my_translate
 
-基于上传的 netcup CCP 英文概览页开发的油猴脚本。安装时只需 `netcup-ccp-zh-cn.user.js`，无需安装 Node.js 或任何依赖。
+针对特定网站界面的简体中文汉化项目，采用本地词库和站点专属规则，逐步增加网站适配。
+
+当前首个适配站点为 **netcup CCP**，基于其英文概览页开发油猴脚本。安装时只需 `netcup-ccp-zh-cn.user.js`，无需安装 Node.js 或任何依赖。
 
 ## 安装
 
 1. 浏览器安装并启用 Tampermonkey（篡改猴）。
-2. 打开 [安装 / 更新脚本](https://raw.githubusercontent.com/wayner6/netcup-ccp-zh-cn/main/netcup-ccp-zh-cn.user.js)，在 Tampermonkey 提示页点击安装。
+2. 打开 [安装 / 更新脚本](https://raw.githubusercontent.com/wayner6/my_translate/main/netcup-ccp-zh-cn.user.js)，在 Tampermonkey 提示页点击安装。
 3. 刷新 `https://www.customercontrolpanel.de/start.php`。
 
 如果链接只显示代码，可手动添加新脚本，删除默认内容，粘贴链接中的全部代码后保存。
