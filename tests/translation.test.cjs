@@ -107,7 +107,7 @@ test('上传样本：整页文字覆盖及敏感字段不变（不执行原站�
     }
     assert.equal(document.querySelectorAll('#sidebar span').length, 8);
     assert.equal(document.querySelector('#sidebar span').textContent, '概览');
-    assert.equal(document.querySelector('input[type=password]').value, '');
+    assert.equal(document.querySelector('input[type=password]').value, baseline.window.document.querySelector('input[type=password]').value);
     assert.match(document.querySelector('#sitecontents').textContent, /点击按钮会将您的姓名和电子邮箱地址提交给 Trustpilot/);
     const walker = document.createTreeWalker(document.querySelector('#sitecontents'), dom.window.NodeFilter.SHOW_TEXT);
     const untranslated = [];
