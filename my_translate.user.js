@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate
 // @namespace    local.my-translate
-// @version      0.5.0
+// @version      0.5.1
 // @description  指定网站界面的本地简体中文汉化，支持 netcup CCP 和 GreenCloud，保留用户数据及产品名称。
 // @homepageURL  https://github.com/wayner6/my_translate
 // @supportURL   https://github.com/wayner6/my_translate/issues
@@ -516,21 +516,6 @@
         'New deals will be updated frequently.': '优惠方案将持续更新。',
         'No refunds/money back on those plans. Please ping/test our IPs before making purchases: https://greencloudvps.com/data-centers.php .Unpaid orders will be cancelled after 30 minutes':
             '这些套餐不支持退款。购买前请先测试我们的 IP：https://greencloudvps.com/data-centers.php 。未付款的订单将在 30 分钟后取消。',
-        'RAM': '内存',
-        'SSD': '固态硬盘',
-        'CPU': '处理器',
-        'Bandwidth': '流量',
-        'Port': '端口速率',
-        'OS': '操作系统',
-        'Location': '位置',
-        'Control Panel': '控制面板',
-        'Backup/Snapshot': '备份 / 快照',
-        'Hard drive': '硬盘',
-        'Hard drives': '硬盘',
-        'Note': '注意',
-        'NOTE': '注意',
-        'No refund/money back on this plan.': '此套餐不支持退款。',
-        'No refund/money back on this plan. Double Storage + Bandwidth for triennial payments': '此套餐不支持退款。选择三年付款周期可获得双倍存储和流量。',
         'Triennially': '每三年',
         'Annually': '每年',
         'Added to Cart': '已加入购物车',
@@ -558,13 +543,11 @@
     ].includes(path);
     const homeScope = '.header-lined, .panel-heading, .panel-footer, .tiles .title, .home-kb-search, #servicesPanel .div-service-status, #servicesPanel .div-service-buttons, #servicesPanel .btn-view-more, #ticketsPanel .label, #ticketsPanel small, #Secondary_Sidebar-Client_Contacts-No_Contacts';
     const scope = `${commonScope}${home ? `, ${homeScope}` : ''}${login ? ', .logincontainer' : ''}${supported ? ', #main-body, #modalAjax, #modalGeneratePassword, #fullpage-overlay, #recommendationsModal' : ''}`;
-    const skipped = 'script, style, noscript, textarea, option:not([value]), select[name="productid"], pre, code, #languageChooserContent, .div-service-name, [menuitemname="Client Details"] .panel-body, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, .product-desc > p, .summary-totals .float-right, .price, .amt, .stat, .badge, [contenteditable]:not([contenteditable="false"]), .notranslate, [translate="no"]';
+    const skipped = 'script, style, noscript, textarea, option:not([value]), select[name="productid"], pre, code, #languageChooserContent, .div-service-name, [menuitemname="Client Details"] .panel-body, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, .product-desc, .feature-value, .summary-totals .float-right, .price, .amt, .stat, .badge, [contenteditable]:not([contenteditable="false"]), .notranslate, [translate="no"]';
     const normalize = text => text.replace(/\s+/g, ' ').trim();
     function eligible(el) {
         if (el.closest(skipped) || !el.closest(scope)) return false;
         if (el.closest('.product header') && !el.closest('.qty')) return false;
-        const feature = el.closest('.feature-value');
-        if (feature && !normalize(feature.textContent).startsWith('No refund/money back on this plan.')) return false;
         // 正文数据和主题不做词库匹配；只处理已识别的状态、操作按钮及空表提示。
         if (el.closest('tbody td') && !el.closest('.btn, button, .label, .status, .textgreen, .textgrey, .dataTables_empty')) return false;
         if (el.closest('#ticketsPanel .list-group-item') && !el.closest('.label, small')) return false;

@@ -38,7 +38,7 @@ test('绿云列表：只翻译表头、状态和操作，不修改产品、主�
     dom.window.close();
 });
 
-test('绿云商店：产品名、配置和价格保留，翻译标签、库存、周期及退款政策', () => {
+test('绿云商店：参数说明完整保留，仅翻译库存、周期和订购按钮', async () => {
     const dom = create(`<section id="main-body"><div id="order-standard_cart"><div class="product">
         <header><span id="product999-name">RAM</span><span class="qty">7 Available</span></header>
         <div class="product-desc"><ul><li><span class="feature-value">Active</span> RAM</li>
@@ -46,16 +46,22 @@ test('绿云商店：产品名、配置和价格保留，翻译标签、库存�
         <li><span class="feature-value">No refund/money back on this plan.</span><strong>Note</strong></li></ul></div>
         <div class="product-pricing"><span class="price">$12.34 USD</span> Annually</div><a class="btn">Order Now</a></div></div></section>`, 'store/13th-birthday-sale');
     const d = dom.window.document;
+    const description = d.querySelector('.product-desc');
+    const before = description.outerHTML;
     dom.window.eval(source);
+    await tick(dom);
     assert.equal(d.querySelector('#product999-name').textContent, 'RAM');
-    assert.equal(d.querySelector('.feature-value').textContent, 'Active');
-    assert.equal(d.querySelectorAll('.feature-value')[1].textContent, '1TB / 10Gbps');
+    assert.equal(description.outerHTML, before);
     assert.equal(d.querySelector('.price').textContent, '$12.34 USD');
     assert.equal(d.querySelector('.qty').textContent, '剩余 7 件');
-    assert.match(d.querySelector('li').textContent, /内存/);
-    assert.equal(d.querySelectorAll('.feature-value')[2].textContent, '此套餐不支持退款。');
     assert.match(d.querySelector('.product-pricing').textContent, /每年/);
     assert.equal(d.querySelector('a').textContent, '立即订购');
+    description.innerHTML = '<ul><li><span class="feature-value">Active</span> CPU</li><li>Control Panel</li><li>No refund/money back on this plan.</li></ul>';
+    const dynamic = description.outerHTML;
+    await tick(dom);
+    dom.window.eval(source);
+    await tick(dom);
+    assert.equal(description.outerHTML, dynamic);
     dom.window.close();
 });
 
@@ -119,8 +125,8 @@ for (const [file, heading] of Object.entries(samples)) {
         const forms = [...d.querySelectorAll('form')];
         const businessData = () => JSON.stringify(forms.map(form => [...new dom.window.FormData(form)]));
         const beforeData = businessData();
-        const variableSelectors = '.price, .amt, .stat, .badge, .product-desc > p, .summary-totals .float-right, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, select[name="productid"], .product header span:not(.qty), .feature-value';
-        const variables = [...d.querySelectorAll(variableSelectors)].filter(el => !el.textContent.trim().startsWith('No refund/money back on this plan.'));
+        const variableSelectors = '.price, .amt, .stat, .badge, .product-desc, .summary-totals .float-right, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, select[name="productid"], .product header span:not(.qty), .feature-value';
+        const variables = [...d.querySelectorAll(variableSelectors)];
         const beforeVariables = variables.map(el => el.outerHTML);
         const attributes = () => JSON.stringify([...d.querySelectorAll('a, form, button, input, select, option')].map(el =>
             [...el.attributes].filter(attr => !['title', 'placeholder', 'aria-label'].includes(attr.name) && !(attr.name === 'value' && el.matches('input[type="submit"]:not([name]), input[type="button"]:not([name])'))).map(attr => [attr.name, attr.value])));
@@ -137,7 +143,7 @@ for (const [file, heading] of Object.entries(samples)) {
         const walker = d.createTreeWalker(d.querySelector('#main-body'), dom.window.NodeFilter.SHOW_TEXT);
         while (walker.nextNode()) {
             const node = walker.currentNode, parent = node.parentElement;
-            if (parent.closest('script, style, textarea, .price, .amt, .badge, .product-desc > p, .summary-totals .float-right, .feature-value, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, select[name="productid"], .product header span:not(.qty)')) continue;
+            if (parent.closest('script, style, textarea, .price, .amt, .badge, .product-desc, .summary-totals .float-right, .feature-value, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, select[name="productid"], .product header span:not(.qty)')) continue;
             if (parent.closest('tbody td') && !parent.closest('.btn, .label, .status, .textgreen, .textgrey, .dataTables_empty')) continue;
             if (parent.closest('[menuitemname="Categories"] .list-group, #order-standard_cart .sidebar-collapsed option')) continue;
             const text = node.data.replace(/\s+/g, ' ').trim();
