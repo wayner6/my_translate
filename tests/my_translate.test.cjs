@@ -25,7 +25,7 @@ test('单一翻译脚本入口、通用身份、站点权限和更新地址', ()
     assert.match(source, /^\/\/ @downloadURL\s+https:\/\/raw\.githubusercontent\.com\/wayner6\/my_translate\/main\/my_translate\.user\.js$/m);
     assert.match(source, /^\/\/ @updateURL\s+https:\/\/raw\.githubusercontent\.com\/wayner6\/my_translate\/main\/my_translate\.user\.js$/m);
     assert.deepEqual(source.match(/^\/\/ @match\s+(.+)$/gm).map(line => line.split(/\s+/).at(-1)), [
-        'https://www.customercontrolpanel.de/*', 'https://greencloudvps.com/billing/*',
+        ...new Set(require('../src/sites.json').flatMap(site => site.matches)),
     ]);
     assert.deepEqual(fs.readdirSync(root).filter(file => file.endsWith('.user.js')).sort(), [
         'my_translate.user.js', 'snapshot-export.user.js',

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "netcup",
+    "name": "netcup CCP",
+    "matches": ["https://www.customercontrolpanel.de/*"]
+  },
+  {
+    "id": "greencloud",
+    "name": "GreenCloud",
+    "matches": ["https://greencloudvps.com/billing/*"]
+  }
+]

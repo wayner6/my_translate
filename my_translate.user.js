@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         my_translate
 // @namespace    local.my-translate
-// @version      0.5.1
-// @description  指定网站界面的本地简体中文汉化，支持 netcup CCP 和 GreenCloud，保留用户数据及产品名称。
+// @version      0.6.0
+// @description  指定网站界面的本地简体中文汉化，按站点选择规则，保留用户数据及产品名称。
 // @homepageURL  https://github.com/wayner6/my_translate
 // @supportURL   https://github.com/wayner6/my_translate/issues
 // @downloadURL  https://raw.githubusercontent.com/wayner6/my_translate/main/my_translate.user.js
@@ -14,6 +14,7 @@
 // @noframes
 // ==/UserScript==
 
+// 由 scripts/build.cjs 自动生成，请修改 src/ 中的源码。
 
 // netcup CCP
 (() => {
@@ -300,7 +301,6 @@
         attributeFilter: ['value', 'title'],
     });
 })();
-
 
 // GreenCloud
 (() => {

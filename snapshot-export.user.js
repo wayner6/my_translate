@@ -13,6 +13,8 @@
 // @noframes
 // ==/UserScript==
 
+// 由 scripts/build.cjs 自动生成，请修改 src/ 中的源码。
+
 (() => {
     'use strict';
     const redacted = '[REDACTED]';
