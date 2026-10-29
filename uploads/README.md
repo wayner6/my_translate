@@ -1,6 +1,6 @@
 # 网页样本
 
-以后请把需要适配的 HTML 文件上传到此目录，建议按页面命名，例如 `products.html`、`invoices.html`。
+以后请按站点建子目录上传需要适配的 HTML；netcup 样本统一放在 `uploads/Netcup/`。建议按页面命名，例如 `products.html`、`invoices.html`，并提供对应网址。导出前先关闭汉化及其他翻译扩展并刷新，保留英文原文。
 
 原始文件仅用于本地分析，不打包进用户脚本，不提交到版本库。上传前请尽可能将姓名、邮箱、客户编号、会话标识和 CSRF 令牌替换为 `REDACTED`，保留 HTML 标签、class、id 和普通界面文字。
 

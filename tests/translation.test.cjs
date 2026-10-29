@@ -74,8 +74,8 @@ test('动态插入、修改文字及按钮；重复运行不会破坏页面', as
     dom.window.close();
 });
 
-test('其他页面只翻译公共导航，不碰未知正文', () => {
-    const dom = setup('<div id="sidebar">Products</div><div id="sitecontents">Overview</div>', 'produkte.php');
+test('未知页面只翻译公共导航，不碰未知正文', () => {
+    const dom = setup('<div id="sidebar">Products</div><div id="sitecontents">Overview</div>', 'unknown.php');
     assert.equal(dom.window.document.querySelector('#sidebar').textContent, '产品');
     assert.equal(dom.window.document.querySelector('#sitecontents').textContent, 'Overview');
     dom.window.close();
@@ -89,7 +89,7 @@ test('动态替换整个导航区域也可翻译', async () => {
     dom.window.close();
 });
 
-const samplePath = path.join(__dirname, '../uploads/netcup_ccp.html');
+const samplePath = path.join(__dirname, '../uploads/Netcup/netcup_ccp.html');
 test('上传样本：整页文字覆盖及敏感字段不变（不执行原站脚本）', { skip: !fs.existsSync(samplePath) }, () => {
     const html = fs.readFileSync(samplePath, 'utf8');
     const baseline = new JSDOM(html);
