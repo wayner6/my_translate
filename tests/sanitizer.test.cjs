@@ -18,7 +18,7 @@ test('导出：移除个人资料、输入值、令牌、工单内容、资源�
         <input name="email" type="email" value="alice@example.invalid"><input type="password" value="initial-password">
         <textarea>private textarea</textarea><input type="submit" value="Login"></form>
         <a href="javascript:alert('private')">Bad</a><img src="captcha.php?token=private-image"><iframe src="private-chat"></iframe>
-        <unknown-extension data-id="private-extension">private injection</unknown-extension>
+        <doubao-ai-csui data-id="private-extension">private injection</doubao-ai-csui>
         </body></html>`, { url: page });
     const d = dom.window.document;
     d.querySelector('input[type=password]').value = 'live-password';
@@ -30,7 +30,7 @@ test('导出：移除个人资料、输入值、令牌、工单内容、资源�
     for (const value of sensitive) assert.ok(!html.includes(value), '敏感值残留');
     const clean = new JSDOM(html);
     const out = clean.window.document;
-    assert.equal(out.querySelectorAll('script, link, iframe, [src], [data-token], [onclick], unknown-extension').length, 0);
+    assert.equal(out.querySelectorAll('script, link, iframe, [src], [data-token], [onclick], doubao-ai-csui').length, 0);
     assert.ok(out.querySelector('meta[http-equiv="Content-Security-Policy"]'));
     assert.equal(out.querySelector('input[type=submit]').value, 'Login');
     assert.equal(out.querySelector('#ticketsPanel .label').textContent, 'Closed');
@@ -110,6 +110,46 @@ test('导出文件名区分 action 和模块筛选，不泄露模块参数值', 
     assert.match(filename, /_clientarea_php_services_filtered-\d+\.html$/);
     assert.ok(!filename.includes('private-module'));
     dom.window.close();
+});
+
+test('保留网站自定义组件和交互定位属性，复制时不触发组件构造函数', () => {
+    const dom = new JSDOM(`<app-settings><button data-toggle="modal" data-target="#settings-modal" data-token="example-secret">Settings</button></app-settings>
+        <div id="settings-modal"><button data-dismiss="modal">Close</button></div><doubao-ai-csui>Extension</doubao-ai-csui>`, { url: page });
+    let constructions = 0;
+    dom.window.customElements.define('app-settings', class extends dom.window.HTMLElement {
+        constructor() { super(); constructions++; }
+    });
+    assert.equal(constructions, 1);
+    const before = dom.window.document.documentElement.outerHTML;
+    const html = sanitizeSnapshot(dom.window.document, page);
+    assert.equal(constructions, 1);
+    assert.equal(dom.window.document.documentElement.outerHTML, before);
+    const clean = new JSDOM(html), d = clean.window.document;
+    assert.ok(d.querySelector('app-settings'));
+    const button = d.querySelector('app-settings button');
+    assert.equal(button.textContent, 'Settings');
+    assert.equal(button.getAttribute('data-toggle'), 'modal');
+    assert.equal(button.getAttribute('data-target'), '#settings-modal');
+    assert.equal(d.querySelector('#settings-modal button').getAttribute('data-dismiss'), 'modal');
+    assert.ok(!html.includes('example-secret'));
+    assert.equal(d.querySelector('doubao-ai-csui'), null);
+    dom.window.close(); clean.window.close();
+});
+
+test('保留静态 hash 页面路由，清除 fragment 中的访问令牌和编号', () => {
+    for (const [hash, expected] of [
+        ['#/settings', '#/settings'], ['#!/account/preferences', '#!/account/preferences'],
+        ['#access_token=fragment-secret', ''], ['#/users/123456', ''],
+    ]) {
+        const dom = new JSDOM('<a href="#access_token=link-secret">Link</a><a href="#settings-modal">Settings</a>');
+        const html = sanitizeSnapshot(dom.window.document, page + hash);
+        const clean = new JSDOM(html), d = clean.window.document;
+        const url = new URL(d.querySelector('meta[name="snapshot-url"]').content);
+        assert.equal(url.hash, expected);
+        assert.ok(!html.includes('fragment-secret') && !html.includes('link-secret') && !html.includes('123456'));
+        assert.equal(d.querySelectorAll('a')[1].getAttribute('href'), '#settings-modal');
+        dom.window.close(); clean.window.close();
+    }
 });
 
 for (const dir of ['Netcup', 'GreenCloud']) {

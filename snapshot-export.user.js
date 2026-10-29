@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate 一键脱敏导出
 // @namespace    local.my-translate.export
-// @version      0.1.1
+// @version      0.1.2
 // @description  导出当前已加载的 HTML 样本，清除已知个人资料、令牌、输入值和脚本；不自动点击或上传。
 // @homepageURL  https://github.com/wayner6/my_translate
 // @downloadURL  https://raw.githubusercontent.com/wayner6/my_translate/main/snapshot-export.user.js
@@ -49,7 +49,9 @@
     }
 
     function sanitizeSnapshot(doc, pageUrl, extraSecrets = []) {
-        const root = doc.documentElement.cloneNode(true);
+        // 在没有应用组件注册表的文档中复制，避免触发原站自定义元素的构造函数。
+        const snapshot = doc.implementation.createHTMLDocument('');
+        const root = snapshot.importNode(doc.documentElement, true);
         const secrets = [...new Set([...collectSecrets(doc), ...extraSecrets])].filter(v => v && v !== redacted).sort((a, b) => b.length - a.length);
         const scrub = text => {
             for (const secret of secrets) text = text.split(secret).join(redacted);
@@ -59,13 +61,15 @@
                 .replace(/\b(?:[a-f0-9]{0,4}:){3,}[a-f0-9:]{0,39}\b/gi, redacted);
         };
         function safeUrl(raw) {
-            if (!raw || raw.startsWith('#')) return raw || '#';
+            if (!raw || raw === '#') return raw || '#';
+            if (/^#[a-z][a-z0-9_-]*$/i.test(raw)) return scrub(raw);
             let url;
             try { url = new URL(raw, pageUrl); } catch { return '#redacted'; }
             if (!['http:', 'https:'].includes(url.protocol)) return '#redacted';
             url.username = '';
             url.password = '';
-            url.hash = '';
+            // 保留静态 SPA 路由；含参数、编号或访问令牌的片段不保留。
+            if (!/^#!?\/(?:[a-z_-]+\/?)*$/i.test(url.hash)) url.hash = '';
             for (const [key, value] of [...url.searchParams]) {
                 if (!(['action', 'a', 'language'].includes(key) && /^[a-z_-]{1,40}$/i.test(value))) url.searchParams.set(key, redacted);
             }
@@ -74,7 +78,6 @@
 
         // 删除脚本、嵌入内容、样式资源和浏览器扩展注入物，避免令牌和追踪参数残留。
         for (const el of root.querySelectorAll('script, style, link, base, iframe, object, embed, template, noscript, svg, canvas, meta:not([charset]), doubao-ai-csui, [id^="doubao-"], [id^="kiss-"], #pv-float-bar-container')) el.remove();
-        for (const el of root.querySelectorAll('*')) if (el.localName.includes('-')) el.remove();
         for (const el of root.querySelectorAll(privateRegions)) {
             const walker = doc.createTreeWalker(el, 4);
             while (walker.nextNode()) if (walker.currentNode.data.trim()) walker.currentNode.data = redacted;
@@ -99,7 +102,7 @@
             // 选项的有无 value 需保留；具体提交值不参与样本分析。
             node.setAttribute('value', redacted);
         }
-        const kept = /^(?:id|class|lang|dir|name|type|role|aria-[\w-]+|value|placeholder|title|alt|for|colspan|rowspan|selected|disabled|multiple|required|readonly|min|max|step|href|action|method|charset|menuitemname)$/i;
+        const kept = /^(?:id|class|lang|dir|name|type|role|aria-[\w-]+|value|placeholder|title|alt|for|colspan|rowspan|selected|disabled|multiple|required|readonly|min|max|step|href|action|method|charset|menuitemname|data-(?:toggle|target|dismiss))$/i;
         for (const el of [root, ...root.querySelectorAll('*')]) {
             for (const attr of [...el.attributes]) {
                 if (!kept.test(attr.name)) el.removeAttribute(attr.name);
