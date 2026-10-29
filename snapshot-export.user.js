@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate 一键脱敏导出
 // @namespace    local.my-translate.export
-// @version      0.1.4
+// @version      0.2.0
 // @description  导出当前已加载的 HTML 样本，清除已知个人资料、令牌、输入值和脚本；不自动点击或上传。
 // @match        http://*/*
 // @match        https://*/*
@@ -145,7 +145,13 @@
     if (!['http:', 'https:'].includes(location.protocol)) return;
 
     function download() {
-        const html = sanitizeSnapshot(document, location.href);
+        let html;
+        try {
+            document.dispatchEvent(new Event('my_translate:export-start'));
+            html = sanitizeSnapshot(document, location.href);
+        } finally {
+            document.dispatchEvent(new Event('my_translate:export-end'));
+        }
         const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
         const link = document.createElement('a');
         link.href = url;

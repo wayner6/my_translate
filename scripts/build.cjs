@@ -29,6 +29,7 @@ function renderScripts(root = project) {
         if (!body || body.includes('// ==UserScript==')) throw new Error(`站点 ${site.id} 的源码应为不含用户脚本元数据的独立作用域。`);
         return `// ${site.name}\n${body}`;
     });
+    const translationState = fs.readFileSync(path.join(root, 'src/translation-state.js'), 'utf8').trim();
     const translation = `// ==UserScript==
 // @name         my_translate
 // @namespace    local.my-translate
@@ -46,7 +47,12 @@ ${matches.map(value => `// @match        ${value}`).join('\n')}
 
 ${banner}
 
+(() => {
+'use strict';
+${translationState}
+
 ${bodies.join('\n\n')}
+})();
 `;
     const exporterSource = fs.readFileSync(path.join(root, 'src/exporter.js'), 'utf8');
     const metadataEnd = '// ==/UserScript==';

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate
 // @namespace    local.my-translate
-// @version      0.6.1
+// @version      0.7.0
 // @description  指定网站界面的本地简体中文汉化，按站点选择规则，保留用户数据及产品名称。
 // @homepageURL  https://github.com/wayner6/my_translate
 // @supportURL   https://github.com/wayner6/my_translate/issues
@@ -15,6 +15,81 @@
 // ==/UserScript==
 
 // 由 scripts/build.cjs 自动生成，请修改 src/ 中的源码。
+
+(() => {
+'use strict';
+// 只记录本脚本修改过的界面文案，不记录用户输入。
+const translationState = (() => {
+    const texts = new WeakMap();
+    const attributes = new WeakMap();
+    let depth = 0;
+    let pending = [];
+
+    function text(node, value) {
+        if (depth || node.data === value) return;
+        const previous = texts.get(node);
+        texts.set(node, {
+            original: previous && node.data === previous.translated ? previous.original : node.data,
+            translated: value,
+        });
+        node.data = value;
+    }
+
+    function attribute(element, name, value) {
+        if (depth || element.getAttribute(name) === value) return;
+        let records = attributes.get(element);
+        if (!records) { records = new Map(); attributes.set(element, records); }
+        const previous = records.get(name);
+        const current = element.getAttribute(name);
+        records.set(name, {
+            original: previous && current === previous.translated ? previous.original : current,
+            translated: value,
+        });
+        element.setAttribute(name, value);
+    }
+
+    function setAttribute(element, name, value) {
+        if (value === null) element.removeAttribute(name);
+        else element.setAttribute(name, value);
+    }
+
+    document.addEventListener('my_translate:export-start', () => {
+        if (depth++ > 0) return;
+        pending = [];
+        const root = document.body || document.documentElement;
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        while (walker.nextNode()) {
+            const node = walker.currentNode;
+            const record = texts.get(node);
+            if (record && node.data === record.translated) {
+                pending.push({ node, record });
+                node.data = record.original;
+            }
+        }
+        for (const element of [root, ...root.querySelectorAll('*')]) {
+            const records = attributes.get(element);
+            if (!records) continue;
+            for (const [name, record] of records) {
+                if (element.getAttribute(name) !== record.translated) continue;
+                pending.push({ node: element, name, record });
+                setAttribute(element, name, record.original);
+            }
+        }
+    });
+
+    document.addEventListener('my_translate:export-end', () => {
+        if (!depth || --depth > 0) return;
+        for (const { node, name, record } of pending) {
+            if (!node.isConnected) continue;
+            if (name) {
+                if (node.getAttribute(name) === record.original) setAttribute(node, name, record.translated);
+            } else if (node.data === record.original) node.data = record.translated;
+        }
+        pending = [];
+    });
+
+    return { text, attribute };
+})();
 
 // netcup CCP
 (() => {
@@ -246,7 +321,7 @@
         if (!translated && dictionary === overview && parent.matches('.panel-heading') && text.startsWith('Welcome ')) {
             translated = `欢迎您，${text.slice('Welcome '.length)}`;
         }
-        if (translated && translated !== text) node.data = node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated);
+        if (translated && translated !== text) translationState.text(node, node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated));
     }
 
     function translate(root) {
@@ -261,7 +336,7 @@
         for (const element of [root, ...root.querySelectorAll('[title]')]) {
             if (element.closest(skipped)) continue;
             const translated = dictionaryFor(element)?.get(normalize(element.getAttribute('title') || ''));
-            if (translated) element.setAttribute('title', translated);
+            if (translated) translationState.attribute(element, 'title', translated);
         }
 
         // 有 name 的按钮 value 可能参与表单提交，不能为了翻译改变业务参数。
@@ -270,7 +345,7 @@
         for (const button of buttons) {
             if (button.closest(skipped)) continue;
             const translated = dictionaryFor(button)?.get(normalize(button.value));
-            if (translated) button.value = translated;
+            if (translated) translationState.attribute(button, 'value', translated);
         }
     }
 
@@ -594,7 +669,7 @@
             const match = /^Copyright © (\d{4}) GreenCloud\. All Rights Reserved\.$/.exec(original);
             if (match) translated = `版权所有 © ${match[1]} GreenCloud。保留所有权利。`;
         }
-        if (translated && translated !== original) node.data = node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated);
+        if (translated && translated !== original) translationState.text(node, node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated));
     }
     function translate(root) {
         if (root.nodeType === Node.TEXT_NODE) { translateText(root); return; }
@@ -610,11 +685,11 @@
                     const match = /^(.*): activate to sort column (ascending|descending)$/.exec(original);
                     if (match) translated = `${terms.get(match[1]) || match[1]}${match[1] ? '：' : ''}点击以${match[2] === 'ascending' ? '升序' : '降序'}排列`;
                 }
-                if (translated) el.setAttribute(attr, translated);
+                if (translated) translationState.attribute(el, attr, translated);
             }
             if (el.matches('input[type="submit"]:not([name]), input[type="button"]:not([name])')) {
                 const translated = terms.get(normalize(el.value));
-                if (translated) el.value = translated;
+                if (translated) translationState.attribute(el, 'value', translated);
             }
         }
     }
@@ -630,4 +705,5 @@
         subtree: true, childList: true, characterData: true, attributes: true,
         attributeFilter: ['title', 'placeholder', 'aria-label', 'value'],
     });
+})();
 })();

@@ -227,7 +227,7 @@
         if (!translated && dictionary === overview && parent.matches('.panel-heading') && text.startsWith('Welcome ')) {
             translated = `欢迎您，${text.slice('Welcome '.length)}`;
         }
-        if (translated && translated !== text) node.data = node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated);
+        if (translated && translated !== text) translationState.text(node, node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated));
     }
 
     function translate(root) {
@@ -242,7 +242,7 @@
         for (const element of [root, ...root.querySelectorAll('[title]')]) {
             if (element.closest(skipped)) continue;
             const translated = dictionaryFor(element)?.get(normalize(element.getAttribute('title') || ''));
-            if (translated) element.setAttribute('title', translated);
+            if (translated) translationState.attribute(element, 'title', translated);
         }
 
         // 有 name 的按钮 value 可能参与表单提交，不能为了翻译改变业务参数。
@@ -251,7 +251,7 @@
         for (const button of buttons) {
             if (button.closest(skipped)) continue;
             const translated = dictionaryFor(button)?.get(normalize(button.value));
-            if (translated) button.value = translated;
+            if (translated) translationState.attribute(button, 'value', translated);
         }
     }
 

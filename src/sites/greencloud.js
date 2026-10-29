@@ -289,7 +289,7 @@
             const match = /^Copyright © (\d{4}) GreenCloud\. All Rights Reserved\.$/.exec(original);
             if (match) translated = `版权所有 © ${match[1]} GreenCloud。保留所有权利。`;
         }
-        if (translated && translated !== original) node.data = node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated);
+        if (translated && translated !== original) translationState.text(node, node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated));
     }
     function translate(root) {
         if (root.nodeType === Node.TEXT_NODE) { translateText(root); return; }
@@ -305,11 +305,11 @@
                     const match = /^(.*): activate to sort column (ascending|descending)$/.exec(original);
                     if (match) translated = `${terms.get(match[1]) || match[1]}${match[1] ? '：' : ''}点击以${match[2] === 'ascending' ? '升序' : '降序'}排列`;
                 }
-                if (translated) el.setAttribute(attr, translated);
+                if (translated) translationState.attribute(el, attr, translated);
             }
             if (el.matches('input[type="submit"]:not([name]), input[type="button"]:not([name])')) {
                 const translated = terms.get(normalize(el.value));
-                if (translated) el.value = translated;
+                if (translated) translationState.attribute(el, 'value', translated);
             }
         }
     }
