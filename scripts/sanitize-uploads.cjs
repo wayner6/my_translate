@@ -22,8 +22,8 @@ for (const name of fs.readdirSync(uploads, { recursive: true }).filter(name => n
     const address = dom.window.document.querySelector('meta[name="snapshot-url"]')?.content || pages[name];
     if (!address) throw new Error(`样本缺少网址，未覆盖文件：${name}`);
     const url = new URL(address);
-    if (!(url.origin === 'https://www.customercontrolpanel.de' || (url.origin === 'https://greencloudvps.com' && url.pathname.startsWith('/billing/')))) {
-        throw new Error(`不支持的样本站点，未覆盖文件：${name}`);
+    if (!['http:', 'https:'].includes(url.protocol)) {
+        throw new Error(`样本网址必须使用 HTTP/HTTPS，未覆盖文件：${name}`);
     }
     samples.push({ file, url: url.href, dom });
 }

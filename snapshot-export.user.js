@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name         my_translate 一键脱敏导出
 // @namespace    local.my-translate.export
-// @version      0.1.2
+// @version      0.1.3
 // @description  导出当前已加载的 HTML 样本，清除已知个人资料、令牌、输入值和脚本；不自动点击或上传。
 // @homepageURL  https://github.com/wayner6/my_translate
 // @downloadURL  https://raw.githubusercontent.com/wayner6/my_translate/main/snapshot-export.user.js
 // @updateURL    https://raw.githubusercontent.com/wayner6/my_translate/main/snapshot-export.user.js
-// @match        https://www.customercontrolpanel.de/*
-// @match        https://greencloudvps.com/billing/*
+// @match        http://*/*
+// @match        https://*/*
 // @grant        GM_registerMenuCommand
 // @run-at       document-end
 // @noframes
@@ -140,6 +140,8 @@
         module.exports = { sanitizeSnapshot, collectSecrets };
         return;
     }
+    if (!['http:', 'https:'].includes(location.protocol)) return;
+
     function download() {
         const html = sanitizeSnapshot(document, location.href);
         const url = URL.createObjectURL(new Blob([html], { type: 'text/html;charset=utf-8' }));
