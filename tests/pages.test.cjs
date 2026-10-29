@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 
-const source = fs.readFileSync(path.join(__dirname, '../netcup-ccp-zh-cn.user.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '../my_translate.user.js'), 'utf8');
 function create(html, page) {
     return new JSDOM(html, {
         url: `https://www.customercontrolpanel.de/${page}`,

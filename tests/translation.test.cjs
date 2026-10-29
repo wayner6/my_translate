@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { JSDOM } = require('jsdom');
 
-const source = fs.readFileSync(path.join(__dirname, '../netcup-ccp-zh-cn.user.js'), 'utf8');
+const source = fs.readFileSync(path.join(__dirname, '../my_translate.user.js'), 'utf8');
 function setup(html, page = 'start.php') {
     // outside-only 不执行样本内的脚本，也不加载网络资源。
     const dom = new JSDOM(html, {

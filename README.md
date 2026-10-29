@@ -8,11 +8,12 @@
 
 | 脚本 | 范围 | 安装链接 |
 |---|---|---|
-| netcup CCP 简体中文 | 概览及六个后台页面 | [安装 / 更新](https://raw.githubusercontent.com/wayner6/my_translate/main/netcup-ccp-zh-cn.user.js) |
-| GreenCloud 简体中文 | 登录、客户中心首页及公共导航 | [安装 / 更新](https://raw.githubusercontent.com/wayner6/my_translate/main/greencloud-zh-cn.user.js) |
+| my_translate | netcup CCP、GreenCloud；按域名自动选择适配规则 | [安装 / 更新](https://raw.githubusercontent.com/wayner6/my_translate/main/my_translate.user.js) |
 | 一键脱敏导出 | netcup / GreenCloud 的 HTML 样本采集，按需安装 | [安装 / 更新](https://raw.githubusercontent.com/wayner6/my_translate/main/snapshot-export.user.js) |
 
-保存后刷新目标页面。无需安装 Node.js 或其他依赖。如果链接只显示代码，可手动添加新脚本、粘贴全部内容并保存。netcup 与 GreenCloud 脚本可同时安装，各自只在对应域名运行。
+保存后刷新目标页面。无需安装 Node.js 或其他依赖。如果链接只显示代码，可手动添加新脚本、粘贴全部内容并保存。**翻译只需安装一个 `my_translate` 脚本**，后续网站适配也合并在该脚本中；一键导出保持独立。
+
+**旧版迁移：**若已安装“netcup CCP 简体中文”或“GreenCloud 简体中文”，请先停用或删除这两个旧脚本，再安装 `my_translate` 并刷新页面。新脚本身份和地址已统一，旧脚本不会自动变成合并版，不能与新版重复启用。
 
 如果没有生效，检查脚本开关、扩展的站点访问权限，并按 Tampermonkey 提示开启“允许用户脚本”或开发者模式。请勿与其他翻译扩展同时翻译同一网站。
 
@@ -82,8 +83,7 @@ netcup 表格正文默认保留，仅在已知账单状态标签中翻译状态�
 
 ```text
 my_translate/
-├── netcup-ccp-zh-cn.user.js
-├── greencloud-zh-cn.user.js
+├── my_translate.user.js          唯一的翻译脚本，按网站隔离规则
 ├── snapshot-export.user.js
 ├── scripts/sanitize-uploads.cjs   对已知本地样本原地脱敏
 ├── uploads/                      本地样本，Git 忽略
@@ -108,12 +108,15 @@ npm run sanitize
 ```sh
 npm ci
 npm test
-node --check netcup-ccp-zh-cn.user.js
-node --check greencloud-zh-cn.user.js
+node --check my_translate.user.js
 node --check snapshot-export.user.js
 ```
 
 jsdom 仅用于开发测试，脚本运行无外部依赖。测试不执行原站脚本、不加载网络资源，检查变量保护、表单参数、动态内容、路由作用域和脱敏。缺少本地样本时对应测试跳过；合成测试仍执行。
+
+### 0.4.0
+
+翻译统一为 `my_translate.user.js`，一次安装同时支持 netcup 和 GreenCloud；词库和监听器按网站隔离，一键导出脚本保持独立。旧的站点专用脚本已移除，请按上方说明迁移。42 项自动化测试通过。
 
 ### 0.3.0
 
