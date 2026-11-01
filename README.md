@@ -1,27 +1,27 @@
 # my_translate
 
-为尚未提供中文界面、但菜单和提示等内容相对固定的网站制作简体中文翻译。通过站点专属规则替换界面文案，保留产品名称、配置和用户数据，减少整页翻译带来的误译。
+给没有中文界面的网站加上简体中文。每个网站有自己的词库，只翻译菜单、按钮、提示这类固定文字，产品名、配置和账户数据保持原样，避免整页机翻带来的误译。
 
-**本项目不以适配所有网站为目标，而是提供一种思路：Fork 本项目，导出自己日常常用网站的页面，再利用 AI 制作和维护适合自己的翻译。**
+这个项目不打算适配所有网站。如果你也想用，可以 Fork 一份，导出自己常用网站的页面，交给 AI 生成翻译。
 
-## 翻译支持网站
+## 已支持的网站
 
 - [netcup CCP](https://www.customercontrolpanel.de/)
 - [GreenCloud（绿云）](https://greencloudvps.com/billing/)
 
 ## 安装
 
-1. 安装并启用 Tampermonkey（篡改猴）。
-2. [安装 / 更新翻译脚本](https://raw.githubusercontent.com/wayner6/my_translate/main/my_translate.user.js)。
-3. 刷新目标网页。
+1. 在浏览器里安装 Tampermonkey（篡改猴）。
+2. 点击[安装翻译脚本](https://raw.githubusercontent.com/wayner6/my_translate/main/my_translate.user.js)，以后点同一个链接就能更新。
+3. 刷新网页。
 
-## 页面导出（可选）
+## 导出页面（可选）
 
-[安装 / 更新导出脚本](https://raw.githubusercontent.com/wayner6/my_translate/main/snapshot-export.user.js)，支持普通 HTTP/HTTPS 网页，仅在手动操作时导出。
+给新网站做翻译前，需要先把页面导出来。装好[导出脚本](https://raw.githubusercontent.com/wayner6/my_translate/main/snapshot-export.user.js)后，在任意 HTTP/HTTPS 网页按 Alt + Shift + E，或在篡改猴菜单里点“导出当前页面”，就会下载一个 HTML 文件。它只在你手动操作时导出。
 
-按 **Alt + Shift + E**，或从篡改猴菜单选择“导出当前页面”，即可下载包含页面结构、文案和经过脱敏处理的网址的 HTML 文件。与最新版翻译脚本配合时，会自动导出本脚本翻译前的原文，并立即恢复中文界面，无需关闭翻译。
+文件里保留页面结构和文字，个人信息和网址参数会做脱敏处理，分享前最好自己再看一遍。导出时不用关掉翻译，脚本会导出英文原文，然后马上切回中文。
 
-## 二次开发
+## 自己修改
 
 ```text
 src/sites.json       站点清单与匹配范围
@@ -30,11 +30,11 @@ src/exporter.js      页面导出器源码
 scripts/build.cjs   生成根目录的两个安装脚本
 ```
 
-先 Fork 本项目，将 `package.json` 的 `repository.url` 改为自己的 Fork 地址。修改源码后运行 `npm run build`、`npm test`，即可生成指向自己仓库的安装脚本和更新地址。详细流程见 [二次开发指南](CONTRIBUTING.md)。
+Fork 之后，把 `package.json` 里的 `repository.url` 改成你自己的仓库地址。改完源码运行 `npm run build` 和 `npm test`，生成的安装脚本和更新地址就会指向你的仓库。详细步骤见[开发指南](CONTRIBUTING.md)。
 
-## 用 AI 基于本项目制作翻译
+## 用 AI 添加新网站
 
-将自己的 Fork 地址或源码与导出的 HTML 一起提供给 AI，然后复制以下提示词：
+把你的 Fork 地址（或源码）和导出的 HTML 一起发给 AI，再附上下面这段提示词：
 
 ```text
 请在我 Fork 的 my_translate 项目中，根据上传的 HTML，为我日常使用的网站增加简体中文适配，不要另写一套独立翻译脚本，也不需要追求适配所有网站。
