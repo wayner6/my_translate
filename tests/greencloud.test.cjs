@@ -113,3 +113,20 @@ for (const file of ['login', 'clientarea']) {
         dom.window.close();
     });
 }
+
+test('绿云：动态监听跳过范围外节点，新插入的翻译区域仍会处理', async () => {
+    const dom = create('<div id="extension"></div>');
+    dom.window.eval(source);
+    const d = dom.window.document;
+    d.querySelector('#extension').innerHTML = '<span>Services</span>';
+    const wrapper = d.createElement('div');
+    wrapper.innerHTML = '<section id="main-menu"><a>Services</a></section>';
+    d.body.append(wrapper);
+    await tick(dom);
+    assert.equal(d.querySelector('#extension span').textContent, 'Services');
+    assert.equal(d.querySelector('#main-menu a').textContent, '服务');
+    d.querySelector('#main-menu a').firstChild.data = 'Billing';
+    await tick(dom);
+    assert.equal(d.querySelector('#main-menu a').textContent, '账务');
+    dom.window.close();
+});

@@ -52,6 +52,16 @@ test('跨页共享脱敏值；邮箱和 IPv4/IPv6 自动清除，保留公开客
     a.window.close(); b.window.close();
 });
 
+test('IPv4 脱敏不误伤版本号，句末 IP 仍会清除', () => {
+    const dom = new JSDOM('<p>Windows 10.0.17763.1, build 1.2.3.4.5, v2.10.0.1, server 203.0.113.7.</p>');
+    const html = sanitizeSnapshot(dom.window.document, page);
+    assert.match(html, /10\.0\.17763\.1/);
+    assert.match(html, /1\.2\.3\.4\.5/);
+    assert.match(html, /v2\.10\.0\.1/);
+    assert.match(html, /server \[REDACTED\]\./);
+    dom.window.close();
+});
+
 test('导出菜单和快捷键下载脱敏副本，不自动下载、点击业务控件或发网络请求', () => {
     const source = fs.readFileSync(path.join(__dirname, '../snapshot-export.user.js'), 'utf8');
     const dom = new JSDOM('<button id="delete">Delete</button><input name="token" type="hidden" value="private-token">', { url: page, runScripts: 'outside-only' });

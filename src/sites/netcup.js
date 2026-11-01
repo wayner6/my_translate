@@ -196,7 +196,7 @@
     const activeScope = `${commonScope}${pageDictionary ? `, ${contentScope}` : ''}`;
     // 没有显式 value 的 option 以文字作为提交值，必须保留原文。
     const skipped = 'script, style, noscript, textarea, option:not([value]), pre, code, [contenteditable]:not([contenteditable="false"]), .notranslate, [translate="no"]';
-    const normalize = text => text.replace(/\s+/g, ' ').trim();
+    const { normalize } = siteKit;
 
     function dictionaryFor(element) {
         if (element.closest(commonScope)) return common;
@@ -227,7 +227,7 @@
         if (!translated && dictionary === overview && parent.matches('.panel-heading') && text.startsWith('Welcome ')) {
             translated = `欢迎您，${text.slice('Welcome '.length)}`;
         }
-        if (translated && translated !== text) translationState.text(node, node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated));
+        if (translated && translated !== text) siteKit.replaceText(node, translated);
     }
 
     function translate(root) {
@@ -258,27 +258,5 @@
     // 只处理站点自身的区域，不扫描其他扩展注入的界面。
     for (const root of document.querySelectorAll(activeScope)) translate(root);
 
-    const observer = new MutationObserver(records => {
-        const pending = new Set();
-        for (const record of records) {
-            if (record.type === 'characterData' || record.type === 'attributes') pending.add(record.target);
-            else for (const node of record.addedNodes) pending.add(node);
-        }
-        for (const node of pending) {
-            if (!node.isConnected) continue;
-            const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
-            if (!element) continue;
-            if (dictionaryFor(element)) translate(node);
-            else if (element.nodeType === Node.ELEMENT_NODE) {
-                for (const root of element.querySelectorAll(activeScope)) translate(root);
-            }
-        }
-    });
-    observer.observe(document.body, {
-        subtree: true,
-        childList: true,
-        characterData: true,
-        attributes: true,
-        attributeFilter: ['value', 'title'],
-    });
+    siteKit.observe(activeScope, translate, ['value', 'title']);
 })();

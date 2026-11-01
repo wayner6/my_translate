@@ -30,6 +30,7 @@ function renderScripts(root = project) {
         return `// ${site.name}\n${body}`;
     });
     const translationState = fs.readFileSync(path.join(root, 'src/translation-state.js'), 'utf8').trim();
+    const siteKit = fs.readFileSync(path.join(root, 'src/site-kit.js'), 'utf8').trim();
     const translation = `// ==UserScript==
 // @name         my_translate
 // @namespace    local.my-translate
@@ -50,6 +51,8 @@ ${banner}
 (() => {
 'use strict';
 ${translationState}
+
+${siteKit}
 
 ${bodies.join('\n\n')}
 })();
