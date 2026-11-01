@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate 一键脱敏导出
 // @namespace    local.my-translate.export
-// @version      0.2.1
+// @version      0.2.2
 // @description  导出当前已加载的 HTML 样本，清除已知个人资料、令牌、输入值和脚本；不自动点击或上传。
 // @match        http://*/*
 // @match        https://*/*
@@ -61,7 +61,8 @@
             for (const secret of secrets) text = text.split(secret).join(redacted);
             return text
                 .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, email => publicEmails.has(email.toLowerCase()) ? email : redacted)
-                .replace(/\b(?:\d{1,3}\.){3}\d{1,3}\b/g, redacted)
+                // 每段不超过 255，且不处于更长的点分数字或 v1.2.3.4 这类词中，避免误伤版本号。
+                .replace(/(?<![\w.])(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)(?!\w|\.\d)/g, redacted)
                 .replace(/\b(?:[a-f0-9]{0,4}:){3,}[a-f0-9:]{0,39}\b/gi, redacted);
         };
         function safeUrl(raw) {

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         my_translate
 // @namespace    local.my-translate
-// @version      0.8.0
+// @version      0.8.1
 // @description  指定网站界面的本地简体中文汉化，按站点选择规则，保留用户数据及产品名称。
 // @homepageURL  https://github.com/wayner6/my_translate
 // @supportURL   https://github.com/wayner6/my_translate/issues
@@ -89,6 +89,36 @@ const translationState = (() => {
     });
 
     return { text, attribute };
+})();
+
+// 各站点共用的小工具；范围、词库和匹配规则仍由站点自己决定。
+const siteKit = (() => {
+    const normalize = text => text.replace(/\s+/g, ' ').trim();
+
+    // 只替换首尾空白之间的文字，保留原有缩进和换行。
+    function replaceText(node, translated) {
+        translationState.text(node, node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated));
+    }
+
+    // 合并同一批变动；范围外的节点只检查其中新出现的翻译区域，不逐个遍历文字。
+    function observe(scope, translate, attributeFilter) {
+        new MutationObserver(records => {
+            const pending = new Set();
+            for (const record of records) {
+                if (record.type === 'childList') for (const node of record.addedNodes) pending.add(node);
+                else pending.add(record.target);
+            }
+            for (const node of pending) {
+                if (!node.isConnected) continue;
+                const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+                if (!element) continue;
+                if (element.closest(scope)) translate(node);
+                else if (node === element) for (const root of element.querySelectorAll(scope)) translate(root);
+            }
+        }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter });
+    }
+
+    return { normalize, replaceText, observe };
 })();
 
 // netcup CCP
@@ -290,7 +320,7 @@ const translationState = (() => {
     const activeScope = `${commonScope}${pageDictionary ? `, ${contentScope}` : ''}`;
     // 没有显式 value 的 option 以文字作为提交值，必须保留原文。
     const skipped = 'script, style, noscript, textarea, option:not([value]), pre, code, [contenteditable]:not([contenteditable="false"]), .notranslate, [translate="no"]';
-    const normalize = text => text.replace(/\s+/g, ' ').trim();
+    const { normalize } = siteKit;
 
     function dictionaryFor(element) {
         if (element.closest(commonScope)) return common;
@@ -321,7 +351,7 @@ const translationState = (() => {
         if (!translated && dictionary === overview && parent.matches('.panel-heading') && text.startsWith('Welcome ')) {
             translated = `欢迎您，${text.slice('Welcome '.length)}`;
         }
-        if (translated && translated !== text) translationState.text(node, node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated));
+        if (translated && translated !== text) siteKit.replaceText(node, translated);
     }
 
     function translate(root) {
@@ -352,29 +382,7 @@ const translationState = (() => {
     // 只处理站点自身的区域，不扫描其他扩展注入的界面。
     for (const root of document.querySelectorAll(activeScope)) translate(root);
 
-    const observer = new MutationObserver(records => {
-        const pending = new Set();
-        for (const record of records) {
-            if (record.type === 'characterData' || record.type === 'attributes') pending.add(record.target);
-            else for (const node of record.addedNodes) pending.add(node);
-        }
-        for (const node of pending) {
-            if (!node.isConnected) continue;
-            const element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
-            if (!element) continue;
-            if (dictionaryFor(element)) translate(node);
-            else if (element.nodeType === Node.ELEMENT_NODE) {
-                for (const root of element.querySelectorAll(activeScope)) translate(root);
-            }
-        }
-    });
-    observer.observe(document.body, {
-        subtree: true,
-        childList: true,
-        characterData: true,
-        attributes: true,
-        attributeFilter: ['value', 'title'],
-    });
+    siteKit.observe(activeScope, translate, ['value', 'title']);
 })();
 
 // GreenCloud
@@ -729,7 +737,7 @@ const translationState = (() => {
     const homeScope = '.header-lined, .panel-heading, .panel-footer, .tiles .title, .home-kb-search, #servicesPanel .div-service-status, #servicesPanel .div-service-buttons, #servicesPanel .btn-view-more, #ticketsPanel .label, #ticketsPanel small, #Secondary_Sidebar-Client_Contacts-No_Contacts';
     const scope = `${commonScope}${home ? `, ${homeScope}` : ''}${login ? ', .logincontainer' : ''}${supported ? ', #main-body, #modalAjax, #modalGeneratePassword, #fullpage-overlay, #recommendationsModal' : ''}`;
     const skipped = 'script, style, noscript, textarea, option:not([value]), select[name="productid"], select[name="country"], select[name="state"], .country-list, .selected-dial-code, .selected-flag, pre, code, #languageChooserContent, .div-service-name, [menuitemname="Client Details"] .panel-body, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, .product-desc, .feature-value, .summary-totals .float-right, .price, .amt, .stat, .badge, [contenteditable]:not([contenteditable="false"]), .notranslate, [translate="no"]';
-    const normalize = text => text.replace(/\s+/g, ' ').trim();
+    const { normalize } = siteKit;
     function eligible(el) {
         if (el.closest(skipped) || !el.closest(scope)) return false;
         if (el.closest('.product header') && !el.closest('.qty')) return false;
@@ -784,7 +792,7 @@ const translationState = (() => {
             const match = /^Copyright © (\d{4}) GreenCloud\. All Rights Reserved\.$/.exec(original);
             if (match) translated = `版权所有 © ${match[1]} GreenCloud。保留所有权利。`;
         }
-        if (translated && translated !== original) translationState.text(node, node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated));
+        if (translated && translated !== original) siteKit.replaceText(node, translated);
     }
     function translate(root) {
         if (root.nodeType === Node.TEXT_NODE) { translateText(root); return; }
@@ -816,16 +824,6 @@ const translationState = (() => {
         }
     }
     for (const root of document.querySelectorAll(scope)) translate(root);
-    new MutationObserver(records => {
-        const pending = new Set();
-        for (const record of records) {
-            if (record.type === 'childList') for (const node of record.addedNodes) pending.add(node);
-            else pending.add(record.target);
-        }
-        for (const node of pending) if (node.isConnected) translate(node);
-    }).observe(document.body, {
-        subtree: true, childList: true, characterData: true, attributes: true,
-        attributeFilter: ['title', 'placeholder', 'aria-label', 'value'],
-    });
+    siteKit.observe(scope, translate, ['title', 'placeholder', 'aria-label', 'value']);
 })();
 })();

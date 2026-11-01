@@ -349,7 +349,7 @@
     const homeScope = '.header-lined, .panel-heading, .panel-footer, .tiles .title, .home-kb-search, #servicesPanel .div-service-status, #servicesPanel .div-service-buttons, #servicesPanel .btn-view-more, #ticketsPanel .label, #ticketsPanel small, #Secondary_Sidebar-Client_Contacts-No_Contacts';
     const scope = `${commonScope}${home ? `, ${homeScope}` : ''}${login ? ', .logincontainer' : ''}${supported ? ', #main-body, #modalAjax, #modalGeneratePassword, #fullpage-overlay, #recommendationsModal' : ''}`;
     const skipped = 'script, style, noscript, textarea, option:not([value]), select[name="productid"], select[name="country"], select[name="state"], .country-list, .selected-dial-code, .selected-flag, pre, code, #languageChooserContent, .div-service-name, [menuitemname="Client Details"] .panel-body, .ticket-number, .ticket-subject, .recent-ticket .truncate, .recent-ticket .pull-right, .service-renewal h3, .service-renewal h4, .product-desc, .feature-value, .summary-totals .float-right, .price, .amt, .stat, .badge, [contenteditable]:not([contenteditable="false"]), .notranslate, [translate="no"]';
-    const normalize = text => text.replace(/\s+/g, ' ').trim();
+    const { normalize } = siteKit;
     function eligible(el) {
         if (el.closest(skipped) || !el.closest(scope)) return false;
         if (el.closest('.product header') && !el.closest('.qty')) return false;
@@ -404,7 +404,7 @@
             const match = /^Copyright © (\d{4}) GreenCloud\. All Rights Reserved\.$/.exec(original);
             if (match) translated = `版权所有 © ${match[1]} GreenCloud。保留所有权利。`;
         }
-        if (translated && translated !== original) translationState.text(node, node.data.replace(/\S(?:[\s\S]*\S)?/, () => translated));
+        if (translated && translated !== original) siteKit.replaceText(node, translated);
     }
     function translate(root) {
         if (root.nodeType === Node.TEXT_NODE) { translateText(root); return; }
@@ -436,15 +436,5 @@
         }
     }
     for (const root of document.querySelectorAll(scope)) translate(root);
-    new MutationObserver(records => {
-        const pending = new Set();
-        for (const record of records) {
-            if (record.type === 'childList') for (const node of record.addedNodes) pending.add(node);
-            else pending.add(record.target);
-        }
-        for (const node of pending) if (node.isConnected) translate(node);
-    }).observe(document.body, {
-        subtree: true, childList: true, characterData: true, attributes: true,
-        attributeFilter: ['title', 'placeholder', 'aria-label', 'value'],
-    });
+    siteKit.observe(scope, translate, ['title', 'placeholder', 'aria-label', 'value']);
 })();

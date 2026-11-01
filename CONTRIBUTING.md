@@ -7,6 +7,7 @@
 ```text
 src/
 ├── translation-state.js    原文记录及导出时的临时还原
+├── site-kit.js             站点共用的文字替换与动态监听工具
 ├── sites.json              站点清单、名称和 @match 范围
 ├── sites/
 │   ├── netcup.js           netcup 独立词库、定位及动态内容处理
@@ -21,7 +22,7 @@ tests/                      自动化测试
 uploads/                    本地 HTML 样本，被 Git 忽略
 ```
 
-每个站点保留独立作用域和自己的处理逻辑，避免不同网站互相影响。当前无需先改造通用翻译引擎才能增加一个网站。
+每个站点保留独立作用域和自己的处理逻辑，避免不同网站互相影响。`site-kit.js` 只提供 `normalize`、`replaceText` 和 `observe` 等通用小工具，范围、词库和匹配规则仍写在站点文件中；新站点可直接复用，无需改造通用引擎。
 
 ## 开始开发
 
@@ -65,7 +66,7 @@ npm test
 
 - 只翻译已确认的固定界面文案，按上下文定位，不全页盲目替换。
 - 产品名称、配置说明、代码、用户资料、编号、IP、域名、价格、日期和工单正文保持原样。动态句子只替换固定部分，保留变量。
-- 用 `translationState.text(node, translated)` 修改文本，用 `translationState.attribute(element, name, translated)` 修改显示属性；不要绕过这两个接口，否则导出时无法恢复原文。状态记录只使用 WeakMap，不保存用户输入。导出器通过同步事件临时还原本项目的文案，完成或失败后立即恢复中文。
+- 用 `translationState.text(node, translated)` 修改文本（`siteKit.replaceText` 在其基础上保留首尾空白），用 `translationState.attribute(element, name, translated)` 修改显示属性；不要绕过这两个接口，否则导出时无法恢复原文。状态记录只使用 WeakMap，不保存用户输入。导出器通过同步事件临时还原本项目的文案，完成或失败后立即恢复中文。
 - 不使用 `innerHTML` 重建已有界面。不修改链接、表单提交参数、隐藏值或用户输入，不自动点击或提交。具名 submit 输入按钮的 `value` 会参与提交，保留其原值，可用 `title` / `aria-label` 提供中文提示。
 - 处理动态节点时只匹配已知文案，翻译结果不能再次触发相同替换。跳过脚本、样式、输入区域及站点的数据区域。
 - 未提供的页面、弹窗、Shadow DOM 或嵌入内容不猜测适配。选择器缺乏依据时补充样本。
